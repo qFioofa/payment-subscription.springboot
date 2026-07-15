@@ -10,6 +10,7 @@ import org.example.domain.service.ObligationService;
 import org.example.domain.service.ObligationServiceImpl;
 import org.example.web.mapper.ObligationWebMapper;
 import org.example.web.mapper.PaymentWebMapper;
+import org.example.web.sse.ObligationEvents;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -34,6 +35,11 @@ public class ApplicationConfiguration {
     @Bean
     public PaymentWebMapper paymentWebMapper() {
         return new PaymentWebMapper();
+    }
+
+    @Bean
+    public ObligationEvents obligationEvents() {
+        return new ObligationEvents();
     }
 
     @Bean

@@ -14,7 +14,9 @@ import org.example.web.model.ObligationRequest;
 import org.example.web.model.ObligationResponse;
 import org.example.web.model.PayResponse;
 import org.example.web.model.UpcomingResponse;
+import org.example.web.sse.ObligationEvents;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
 @RequestMapping("/obligations")
@@ -34,15 +37,18 @@ public class ObligationController {
     private final ObligationService service;
     private final ObligationWebMapper obligationMapper;
     private final PaymentWebMapper paymentMapper;
+    private final ObligationEvents events;
 
     public ObligationController(
             ObligationService service,
             ObligationWebMapper obligationMapper,
-            PaymentWebMapper paymentMapper
+            PaymentWebMapper paymentMapper,
+            ObligationEvents events
     ) {
         this.service = service;
         this.obligationMapper = obligationMapper;
         this.paymentMapper = paymentMapper;
+        this.events = events;
     }
 
     @PostMapping
@@ -81,6 +87,12 @@ public class ObligationController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         service.delete(id);
+        events.obligationDeleted(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping(value = "/events", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter events() {
+        return events.subscribe();
     }
 }

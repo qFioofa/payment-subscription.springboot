@@ -10,7 +10,7 @@ spring:
       ddl-auto: validate
     open-in-view: false
   flyway:
-    locations: classpath:db/migration
+    locations: ${FLYWAY_LOCATIONS:filesystem:../database/migration}
   jackson:
     property-naming-strategy: SNAKE_CASE
 
